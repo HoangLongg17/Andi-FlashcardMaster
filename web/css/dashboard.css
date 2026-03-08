@@ -1,0 +1,103 @@
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background: #333;
+  color: #fff;
+  padding: 20px;
+}
+
+.sidebar .logo {
+  margin-bottom: 20px;
+  color: #ff4081;
+}
+
+.sidebar .menu {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar .menu li {
+  margin-bottom: 15px;
+}
+
+.sidebar .menu li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.sidebar .menu li a:hover {
+  color: #ff4081;
+}
+
+.sidebar .profile {
+  margin-top: 40px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+/* Main content */
+.main {
+  flex: 1;
+  padding: 30px;
+  background: #f9f9f9;
+}
+
+/* Banner */
+.banner {
+  background: #ff9800;
+  color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.banner h3 {
+  margin: 0;
+}
+
+.banner .day {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+/* Features section */
+.features h2 {
+  margin-bottom: 20px;
+}
+
+.feature-cards {
+  display: flex;
+  gap: 20px;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  flex: 1;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card h3 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.card p {
+  color: #555;
+}

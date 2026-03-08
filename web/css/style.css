@@ -1,0 +1,434 @@
+/* Reset cơ bản */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding-top: 70px; /* chừa chỗ cho header */
+  line-height: 1.6;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  z-index: 1000;
+  box-sizing: border-box;
+}
+
+header .logo {
+  display: flex;
+  align-items: center;
+}
+
+header .logo img {
+  height: 40px;       /* chỉnh kích thước logo */
+  margin-right: 10px; /* khoảng cách giữa logo và chữ */
+}
+
+header .logo span {
+  font-weight: bold;
+  font-size: 22px;
+  color: #ff4081;
+}
+
+header nav {
+  display: flex;
+  align-items: center;
+  margin-right: 20px; /* đẩy nav vào trong một chút */
+}
+
+header nav a {
+  margin-left: 15px;
+  text-decoration: none;
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+header nav a:hover {
+  color: #ff4081;
+}
+
+header nav a.login {
+  color: #333;
+}
+
+header nav a.login:hover {
+  color: #ff4081;
+}
+
+header nav a.signup {
+  background: #009688;   /* xanh ngọc */
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 30px;   /* bo tròn */
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+header nav a.signup:hover {
+  background: #00796b;
+}
+/* Hero section */
+.hero {
+  padding: 100px 40px 60px;
+  background: linear-gradient(135deg, #ffecec, #fff);
+}
+
+.hero-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.hero-text {
+  flex: 1;
+  min-width: 300px;
+}
+
+.hero-text h1 {
+  font-size: 48px;       /* tiêu đề to hơn */
+  line-height: 1.3;
+  margin-bottom: 30px;
+  color: #333;
+}
+.hero-text .subtitle {
+  font-size: 20px;       /* nhỏ hơn tiêu đề */
+  color: #555;
+  margin-bottom: 30px;
+}
+.hero-text .highlight {
+  color: #ff4081;        /* highlight màu hồng */
+  font-weight: bold;
+}
+
+.hero-buttons {
+  display: flex;
+  align-items: center;
+  gap: 30px;             /* khoảng cách giữa 2 nút */
+}
+
+.btn-primary {
+  background: #009688;   /* xanh ngọc */
+  color: #fff;
+  border: none;
+  padding: 14px 28px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 30px;   /* bo tròn */
+  font-weight: bold;
+  white-space: nowrap;
+  transition: background 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: #00796b;   /* xanh ngọc đậm hơn khi hover */
+}
+
+.btn-secondary {
+  display: inline-block;
+  background: #fff;              /* nền trắng */
+  color: #000000;                /* chữ đen */
+  border: 2px solid #ff4081;     /* viền hồng */
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 30px;           /* bo tròn */
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #ff4081;           /* hover nền hồng */
+  color: #fff; 
+}
+
+/* Hero image */
+.hero-image {
+  flex: 1;
+  min-width: 300px;
+  text-align: center;
+}
+
+.hero-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 20px;   /* bo góc tròn */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Sections */
+.features {
+  padding: 80px 20px;
+  text-align: center;
+  background: #fff;
+}
+
+.features-header h2 {
+  font-size: 40px;       /* dòng to */
+  color: #ff4081;
+  margin-bottom: 10px;
+}
+
+.features-header .subtitle {
+  font-size: 22px;       /* dòng nhỏ hơn */
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.features-header .sub-subtitle {
+  font-size: 18px;       /* dòng nhỏ nhất */
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.feature-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.feature {
+  background: #f9f9f9;
+  padding: 30px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+
+.feature:hover {
+  transform: translateY(-5px);
+}
+
+.feature img {
+  height: 60px;
+  margin-bottom: 15px;
+}
+
+.feature h3 {
+  font-size: 20px;
+  color: #333;
+}
+/*WHY*/
+.why {
+  padding: 80px 20px;
+  text-align: center;
+  background: #fff;
+}
+
+.why-header h2 {
+  font-size: 40px;       /* dòng to */
+  color: #ff4081;        /* highlight màu hồng */
+  margin-bottom: 10px;
+}
+
+.why-header .subtitle {
+  font-size: 24px;       /* dòng nhỏ hơn */
+  color: #333;
+  margin-bottom: 40px;
+}
+
+.benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.benefit {
+  background: #f9f9f9;
+  padding: 30px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+
+.benefit:hover {
+  transform: translateY(-5px);
+}
+
+.benefit img {
+  height: 60px;
+  margin-bottom: 15px;
+}
+
+.benefit h3 {
+  font-size: 20px;
+  color: #333;
+}
+
+/* FAQ */
+.faq {
+  padding: 80px 20px;
+  background: #fff;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.faq-header h2 {
+  font-size: 40px;       /* tiêu đề to */
+  color: #ff4081;        /* màu hồng nổi bật */
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.question {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+
+.question:hover {
+  transform: translateY(-5px);
+}
+
+.question h3 {
+  font-size: 22px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.question p {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.5;
+}
+/* CTA section */
+.cta {
+  padding: 80px 20px;
+  text-align: center;
+  background: linear-gradient(135deg, #ffecec, #fff);
+}
+
+.cta-content h2 {
+  font-size: 36px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.cta-content .btn-primary {
+  background: #ff4081;
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.cta-content .btn-primary:hover {
+  background: #e73370;
+}
+/* Footer */
+footer {
+  background: #333;
+  color: white;
+  padding: 40px 20px;
+}
+
+.footer-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-logo {
+  flex: 1;
+  min-width: 250px;
+  margin-bottom: 20px;
+}
+
+.footer-logo h3 {
+  font-size: 24px;
+  color: #ff4081;
+  margin-bottom: 10px;
+}
+
+.footer-logo p {
+  font-size: 16px;
+  color: #ccc;
+}
+
+.footer-links {
+  flex: 1;
+  min-width: 200px;
+  margin-bottom: 20px;
+}
+
+.footer-links h4 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links ul li {
+  margin-bottom: 8px;
+}
+
+.footer-links ul li a {
+  color: #ccc;
+  text-decoration: none;
+}
+
+.footer-links ul li a:hover {
+  color: #ff4081;
+}
+.footer-bottom {
+  background: #222;
+  color: #ccc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  font-size: 14px;
+}
+
+.footer-bottom p {
+  margin: 0;
+}
+
+.footer-links-right a {
+  color: #ccc;
+  text-decoration: none;
+  margin-left: 20px;
+}
+
+.footer-links-right a:hover {
+  color: #ff4081; /* đổi sang hồng khi hover */
+}
+
+/* Hiệu ứng cuộn */
+.animate {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.8s ease-out;
+}
+
+.animate.show {
+  opacity: 1;
+  transform: translateY(0);
+}
