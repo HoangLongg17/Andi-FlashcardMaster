@@ -1,49 +1,75 @@
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Andi - Trang chủ</title>
-  <link rel="stylesheet" href="/css/dashboard.css">
-</head>
-<body>
-  <div class="dashboard">
+<?php
+/** @var yii\web\View $this */
+$this->title = 'Trang chủ Andi';
+?>
+
+<div class="dashboard">
     <!-- Sidebar -->
     <aside class="sidebar">
-      <h2 class="logo">Andi</h2>
-      <ul class="menu">
-        <li><a href="#">Trang chủ</a></li>
-        <li><a href="#">Bộ từ vựng</a></li>
-        <li><a href="#">Từ vựng</a></li>
-        <li><a href="#">Luyện tập</a></li>
-      </ul>
-      <div class="profile">
-        <p>Nguyễn Văn A</p>
-        <small>Click để xem hồ sơ</small>
-      </div>
+        <ul class="menu">
+            <li><a href="/index.php?r=site/dashboard" class="active"><img src="/icons/home.png" alt=""> Trang chủ</a></li>
+            <li><a href="#"><img src="/icons/vocabset.png" alt=""> Bộ từ vựng</a></li>
+            <li><a href="#"><img src="/icons/vocabulary.png" alt=""> Từ vựng</a></li>
+            <li><a href="#"><img src="/icons/practice.png" alt=""> Luyện tập</a></li>
+        </ul>
+
+        <!-- Toggle button -->
+        <button class="toggle-btn">&laquo;</button>
+
+        <!-- Profile section -->
+        <div class="profile">
+            <div class="avatar">
+                <img src="/images/andi-avatar.png" alt="User Avatar">
+            </div>
+            <p class="username">Nguyễn Văn A</p>
+            <div class="profile-actions">
+                <button class="btn-profile">Xem hồ sơ</button>
+                <label class="theme-switch">
+                    <input type="checkbox" id="darkModeToggle">
+                    <span class="slider"></span>
+                    <span class="label-text">Tối</span>
+                </label>
+            </div>
+        </div>
     </aside>
 
     <!-- Main content -->
     <main class="main">
-      <!-- Banner -->
-      <div class="banner">
-        <h3>CHUỖI NGÀY HỌC</h3>
-        <div class="day">1</div>
-      </div>
+        <div class="content-row">
+            <!-- Cover image -->
+            <div class="cover">
+                <img src="/images/cover-default.jpg" alt="Ảnh bìa">
+            </div>
 
-      <!-- Features -->
-      <section class="features">
-        <h2>Tính năng</h2>
-        <div class="feature-cards">
-          <div class="card">
-            <h3>Thêm bộ thẻ</h3>
-            <p>Tạo bộ thẻ từ vựng cá nhân</p>
-          </div>
-          <div class="card">
-            <h3>Luyện tập</h3>
-            <p>Ôn tập bộ từ vựng</p>
-          </div>
+            <!-- Learning streak -->
+            <div class="banner">
+                <h3>🔥 CHUỖI NGÀY HỌC</h3>
+                <p class="streak">1 ngày</p>
+                <div class="days">
+                    <span>T3</span>
+                    <span>T4</span>
+                    <span>T5</span>
+                    <span>T6</span>
+                    <span>T7</span>
+                    <span>CN</span>
+                    <span class="active">T2</span>
+                </div>
+            </div>
         </div>
-      </section>
+
+        <!-- Features -->
+        <section class="features">
+            <h2>Tính năng</h2>
+            <div class="feature-buttons">
+                <button class="btn-feature">
+                    <img src="/icons/flashcard.png" alt="Flashcard Icon">
+                    Thêm bộ thẻ
+                </button>
+                <button class="btn-feature">
+                    <img src="/icons/practice.png" alt="Practice Icon">
+                    Luyện tập
+                </button>
+            </div>
+        </section>
     </main>
-  </div>
-</body>
-</html>
+</div>

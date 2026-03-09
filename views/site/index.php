@@ -1,23 +1,6 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Andi - Học từ vựng</title>
-  <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-  <!-- Header -->
-  <header>
-    <div class="logo">
-      <img src="/images/andilogo.png" alt="Andi Logo">
-      <span>Andi</span>
-    </div>
-    <nav>
-      <a href="#" class="login">Đăng nhập</a>
-      <a href="#" class="signup">Đăng ký</a>
-    </nav>
-  </header>
-
+  <?php
+  $this->title = 'Andi - Học từ vựng';
+  ?>
   <!-- Hero section -->
   <section class="hero">
     <div class="hero-content">
@@ -122,42 +105,3 @@
       <button class="btn-primary">Đăng ký miễn phí ngay →</button>
     </div>
   </section>
-
-  <footer>
-    <div class="footer-content">
-      <div class="footer-logo">
-        <h3>Andi</h3>
-        <p>Nền tảng học từ vựng miễn phí hàng đầu tại Việt Nam</p>
-      </div>
-
-      <div class="footer-links">
-        <h4>Tính năng</h4>
-        <ul>
-          <li>Flashcard</li>
-          <li>SM-2</li>
-          <li>FSRS</li>
-        </ul>
-      </div>
-
-      <div class="footer-links">
-        <h4>Liên kết</h4>
-        <ul>
-          <li><a href="#">Facebook</a></li>
-          <li><a href="#">Đăng nhập</a></li>
-          <li><a href="#">Đăng ký</a></li>
-        </ul>
-      </div>
-    </div>
-  </footer>
-
-  <div class="footer-bottom">
-    <p>© Andi — Made in Vietnam</p>
-    <div class="footer-links-right">
-      <a href="#">Điều khoản</a>
-      <a href="#">Bảo mật</a>
-    </div>
-  </div>
-
-  <script src="/js/script.js"></script>
-</body>
-</html>
