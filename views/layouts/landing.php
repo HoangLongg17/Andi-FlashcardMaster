@@ -19,11 +19,11 @@ AppAsset::register($this);
 <!-- Header riêng cho landing -->
 <header>
     <div class="logo">
-        <img src="/images/andilogo.png" alt="Andi Logo">
+        <img src="<?= Yii::getAlias('@web') ?>/images/andilogo.png" alt="Andi Logo">
         <span>Andi</span>
     </div>
     <nav>
-        <a href="/index.php?r=site/dashboard" class="login">Đăng nhập</a>
+        <a href="<?= Yii::$app->urlManager->createUrl(['site/dashboard']) ?>" class="login">Đăng nhập</a>
         <a href="#" class="signup">Đăng ký</a>
     </nav>
 </header>

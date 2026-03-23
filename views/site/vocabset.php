@@ -10,161 +10,130 @@ $this->title = 'Quản lý Bộ thẻ - Andi';
 $this->registerCssFile('@web/css/dashboard.css', ['depends' => [\app\assets\AppAsset::class]]);
 $this->registerCssFile('@web/css/vocabset.css', ['depends' => [\app\assets\AppAsset::class]]);
 ?>
-
-<div class="dashboard">
-    <!-- Sidebar Hoàn chỉnh -->
-    <aside class="sidebar">
-        <ul class="menu">
-            <li><a href="<?= Url::to(['site/dashboard']) ?>"><img src="<?= Yii::getAlias('@web') ?>/icons/home.png" alt=""> Trang chủ</a></li>
-            <li><a href="<?= Url::to(['site/vocabset']) ?>" class="active"><img src="<?= Yii::getAlias('@web') ?>/icons/vocabset.png" alt=""> Bộ thẻ</a></li>
-            <li><a href="<?= Url::to(['site/vocabulary']) ?>"><img src="<?= Yii::getAlias('@web') ?>/icons/vocabulary.png" alt=""> Từ vựng</a></li>
-            <li><a href="#"><img src="<?= Yii::getAlias('@web') ?>/icons/practice.png" alt=""> Luyện tập</a></li>
-        </ul>
-        <button class="toggle-btn">&laquo;</button>
+    <div class="vocabset-header">
+        <h1>Quản lý Bộ thẻ</h1>
         
-        <!-- Phần Profile (Có Avatar và Nút Sáng/Tối) -->
-        <div class="profile">
-            <div class="avatar"><img src="<?= Yii::getAlias('@web') ?>/images/andi-avatar.png" alt="Avatar"></div>
-            <p class="username">Nguyễn Văn A</p>
-            <div class="profile-actions">
-                <button class="btn-profile">Xem hồ sơ</button>
-                <label class="theme-switch">
-                    <input type="checkbox" id="darkModeToggle">
-                    <span class="slider"></span>
-                    <span class="label-text">Tối</span>
-                </label>
+        <div class="vocabset-actions">
+            <!-- KHỐI NHẬP ID CHIA SẺ -->
+            <div class="share-import-group">
+                <input type="text" id="importDeckId" placeholder="Nhập ID bộ bài..." class="search-input-mini">
+                <button class="btn-import-share" onclick="importDeck()">Nhận bộ bài</button>
             </div>
-        </div>
-    </aside>
 
-    <main class="main">
-        <div class="vocabset-header">
-            <h1>Quản lý Bộ thẻ</h1>
-            
-            <div class="vocabset-actions">
-                <!-- KHỐI NHẬP ID CHIA SẺ -->
-                <div class="share-import-group">
-                    <input type="text" id="importDeckId" placeholder="Nhập ID bộ bài..." class="search-input-mini">
-                    <button class="btn-import-share" onclick="importDeck()">Nhận bộ bài</button>
-                </div>
-
-                <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="Tìm kiếm bộ bài..." class="search-input">
-                </div>
-                <button class="btn-create-set" onclick="openModal('modalCreate')">+ Tạo mới</button>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Tìm kiếm bộ bài..." class="search-input">
             </div>
+            <button class="btn-create-set" onclick="openModal('modalCreate')">+ Tạo mới</button>
         </div>
+    </div>
 
-        <div class="set-list" id="deckListContainer">
-            <?php foreach ($decks as $deck): ?>
-                <?php 
-                    $n = 0; $l = 0; $r = 0;
-                    foreach($deck->cards as $c) {
-                        $s = $c->progress ? $c->progress->status : 0;
-                        if ($s == 0) $n++; elseif ($s == 1) $l++; else $r++;
-                    }
-                ?>
-                <div class="set-row deck-item" data-name="<?= strtolower(Html::encode($deck->name)) ?>" onclick="openModal('modalView-<?= $deck->deckid ?>')">
-                    <div class="set-main-info">
-                        <div class="set-icon-box">📂</div>
-                        <div class="set-details">
-                            <h3><?= Html::encode($deck->name) ?></h3>
-                            <span><?= count($deck->cards) ?> thẻ</span>
-                        </div>
-                    </div>
-
-                    <div class="set-stats">
-                        <div class="stat-item stat-new"><span class="stat-number"><?= $n ?></span><span class="stat-label">Mới</span></div>
-                        <div class="stat-item stat-learning"><span class="stat-number"><?= $l ?></span><span class="stat-label">Đang học</span></div>
-                        <div class="stat-item stat-review"><span class="stat-number"><?= $r ?></span><span class="stat-label">Ôn tập</span></div>
-                        
-                        <!-- NÚT CHIA SẺ ID -->
-                        <button class="btn-share-id" onclick="event.stopPropagation(); shareId(<?= $deck->deckid ?>)" title="Copy ID để chia sẻ">🔗</button>
-                        
-                        <button class="btn-edit-trigger" onclick="event.stopPropagation(); openModal('modalEdit-<?= $deck->deckid ?>')">✏️</button>
+    <div class="set-list" id="deckListContainer">
+        <?php foreach ($decks as $deck): ?>
+            <?php 
+                $n = 0; $l = 0; $r = 0;
+                foreach($deck->cards as $c) {
+                    $s = $c->progress ? $c->progress->status : 0;
+                    if ($s == 0) $n++; elseif ($s == 1) $l++; else $r++;
+                }
+            ?>
+            <div class="set-row deck-item" data-name="<?= strtolower(Html::encode($deck->name)) ?>" onclick="openModal('modalView-<?= $deck->deckid ?>')">
+                <div class="set-main-info">
+                    <div class="set-icon-box">📂</div>
+                    <div class="set-details">
+                        <h3><?= Html::encode($deck->name) ?></h3>
+                        <span><?= count($deck->cards) ?> thẻ</span>
                     </div>
                 </div>
 
-                <!-- POP-UP XEM CHI TIẾT BỘ THẺ -->
-                <div id="modalView-<?= $deck->deckid ?>" class="modal-overlay" onclick="closeModal(this)">
-                    <div class="modal-content" onclick="event.stopPropagation()">
-                        <div class="modal-header">
-                            <h2>Chi tiết bộ thẻ (ID: <?= $deck->deckid ?>)</h2>
-                            <button class="btn-close-modal" onclick="closeModalById('modalView-<?= $deck->deckid ?>')">&times;</button>
-                        </div>
+                <div class="set-stats">
+                    <div class="stat-item stat-new"><span class="stat-number"><?= $n ?></span><span class="stat-label">Mới</span></div>
+                    <div class="stat-item stat-learning"><span class="stat-number"><?= $l ?></span><span class="stat-label">Đang học</span></div>
+                    <div class="stat-item stat-review"><span class="stat-number"><?= $r ?></span><span class="stat-label">Ôn tập</span></div>
+                    
+                    <!-- NÚT CHIA SẺ ID -->
+                    <button class="btn-share-id" onclick="event.stopPropagation(); shareId(<?= $deck->deckid ?>)" title="Copy ID để chia sẻ">🔗</button>
+                    
+                    <button class="btn-edit-trigger" onclick="event.stopPropagation(); openModal('modalEdit-<?= $deck->deckid ?>')">✏️</button>
+                </div>
+            </div>
+
+            <!-- POP-UP XEM CHI TIẾT BỘ THẺ -->
+            <div id="modalView-<?= $deck->deckid ?>" class="modal-overlay" onclick="closeModal(this)">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2>Chi tiết bộ thẻ (ID: <?= $deck->deckid ?>)</h2>
+                        <button class="btn-close-modal" onclick="closeModalById('modalView-<?= $deck->deckid ?>')">&times;</button>
+                    </div>
+                    
+                    <div class="deck-top-info">
+                        <h3 style="margin: 0 0 10px 0; font-size: 22px; color: #2b6cb0;">
+                            <span class="deck-info-label">Tên bộ thẻ:</span> <?= Html::encode($deck->name) ?>
+                        </h3>
+                        <p style="margin: 0; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                            <span class="deck-info-label">Mô tả:</span> <?= Html::encode($deck->description) ?: 'Chưa có mô tả cho bộ thẻ này.' ?>
+                        </p>
+                    </div>
+
+                    <hr class="deck-divider">
+
+                    <div class="cards-area">
+                        <h4 style="margin-top: 0; margin-bottom: 20px; color: #2d3748; font-size: 18px;">
+                            Danh sách thẻ từ vựng (<span id="cardCount-<?= $deck->deckid ?>"><?= count($deck->cards) ?></span> thẻ)
+                        </h4>
                         
-                        <div class="deck-top-info">
-                            <h3 style="margin: 0 0 10px 0; font-size: 22px; color: #2b6cb0;">
-                                <span class="deck-info-label">Tên bộ thẻ:</span> <?= Html::encode($deck->name) ?>
-                            </h3>
-                            <p style="margin: 0; color: #4a5568; font-size: 16px; line-height: 1.6;">
-                                <span class="deck-info-label">Mô tả:</span> <?= Html::encode($deck->description) ?: 'Chưa có mô tả cho bộ thẻ này.' ?>
-                            </p>
-                        </div>
-
-                        <hr class="deck-divider">
-
-                        <div class="cards-area">
-                            <h4 style="margin-top: 0; margin-bottom: 20px; color: #2d3748; font-size: 18px;">
-                                Danh sách thẻ từ vựng (<span id="cardCount-<?= $deck->deckid ?>"><?= count($deck->cards) ?></span> thẻ)
-                            </h4>
-                            
-                            <?php if (empty($deck->cards)): ?>
-                                <p style="text-align: center; color: #a0aec0; padding: 20px;">Không có từ vựng nào trong bộ thẻ này.</p>
-                            <?php else: ?>
-                                <?php foreach($deck->cards as $card): ?>
-                                    <div class="card-row-display" id="card-row-<?= $card->cardid ?>">
-                                        <div class="card-main-content">
-                                            <div class="content-part"><label>Mặt trước</label><div class="content-text" style="color:#3182ce;"><?= Html::encode($card->frontcontent) ?></div></div>
-                                            <div class="content-part"><label>Mặt sau</label><div class="content-text"><?= Html::encode($card->backcontent) ?></div></div>
-                                        </div>
-                                        <div class="card-meta-info">
-                                            <div class="meta-item"><strong>Phiên âm:</strong> <?= Html::encode($card->pronunciation) ?: 'N/A' ?></div>
-                                            <div style="width:100%; margin-top:5px;"><strong>Ví dụ:</strong> <em style="color: #718096;">"<?= Html::encode($card->examplesentence) ?: 'Chưa có ví dụ' ?>"</em></div>
-                                            <div style="flex-grow:1; text-align:right;">
-                                                <span class="status-badge status-<?= $card->progress ? $card->progress->status : 0 ?>">
-                                                    <?= $card->progress ? ($card->progress->status == 0 ? 'Mới' : ($card->progress->status == 1 ? 'Đang học' : 'Ôn tập')) : 'Mới' ?>
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="card-actions-inner" style="margin-top: 15px; display: flex; justify-content: flex-end;">
-                                            <button onclick="removeFromDeck(<?= $card->cardid ?>, <?= $deck->deckid ?>)" style="padding: 6px 15px; border: 1px solid #f44336; color: #f44336; background: #fff5f5; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Nunito'; transition: all 0.2s;">
-                                                ✖ Gỡ khỏi bộ
-                                            </button>
+                        <?php if (empty($deck->cards)): ?>
+                            <p style="text-align: center; color: #a0aec0; padding: 20px;">Không có từ vựng nào trong bộ thẻ này.</p>
+                        <?php else: ?>
+                            <?php foreach($deck->cards as $card): ?>
+                                <div class="card-row-display" id="card-row-<?= $card->cardid ?>">
+                                    <div class="card-main-content">
+                                        <div class="content-part"><label>Mặt trước</label><div class="content-text" style="color:#3182ce;"><?= Html::encode($card->frontcontent) ?></div></div>
+                                        <div class="content-part"><label>Mặt sau</label><div class="content-text"><?= Html::encode($card->backcontent) ?></div></div>
+                                    </div>
+                                    <div class="card-meta-info">
+                                        <div class="meta-item"><strong>Phiên âm:</strong> <?= Html::encode($card->pronunciation) ?: 'N/A' ?></div>
+                                        <div style="width:100%; margin-top:5px;"><strong>Ví dụ:</strong> <em style="color: #718096;">"<?= Html::encode($card->examplesentence) ?: 'Chưa có ví dụ' ?>"</em></div>
+                                        <div style="flex-grow:1; text-align:right;">
+                                            <span class="status-badge status-<?= $card->progress ? $card->progress->status : 0 ?>">
+                                                <?= $card->progress ? ($card->progress->status == 0 ? 'Mới' : ($card->progress->status == 1 ? 'Đang học' : 'Ôn tập')) : 'Mới' ?>
+                                            </span>
                                         </div>
                                     </div>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
+                                    <div class="card-actions-inner" style="margin-top: 15px; display: flex; justify-content: flex-end;">
+                                        <button onclick="removeFromDeck(<?= $card->cardid ?>, <?= $deck->deckid ?>)" style="padding: 6px 15px; border: 1px solid #f44336; color: #f44336; background: #fff5f5; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Nunito'; transition: all 0.2s;">
+                                            ✖ Gỡ khỏi bộ
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
+            </div>
 
-                <!-- POP-UP SỬA THÔNG TIN BỘ THẺ -->
-                <div id="modalEdit-<?= $deck->deckid ?>" class="modal-overlay" onclick="closeModal(this)">
-                    <div class="modal-content" onclick="event.stopPropagation()">
-                        <div class="modal-header">
-                            <h2>Chỉnh sửa bộ thẻ</h2>
-                            <button class="btn-close-modal" onclick="closeModalById('modalEdit-<?= $deck->deckid ?>')">&times;</button>
-                        </div>
-                        <div class="input-group">
-                            <label>Tên bộ thẻ</label>
-                            <input type="text" id="edit-name-<?= $deck->deckid ?>" class="full-input" value="<?= Html::encode($deck->name) ?>">
-                        </div>
-                        <div class="input-group">
-                            <label>Mô tả bộ thẻ</label>
-                            <textarea id="edit-desc-<?= $deck->deckid ?>" class="full-input" rows="5"><?= Html::encode($deck->description) ?></textarea>
-                        </div>
-                        <div style="display:flex; justify-content: space-between; margin-top: 20px;">
-                            <button class="btn-delete-deck" onclick="deleteDeck(<?= $deck->deckid ?>)">Xóa bộ bài</button>
-                            <button class="btn-save" onclick="updateDeck(<?= $deck->deckid ?>)">Lưu thay đổi</button>
-                        </div>
+            <!-- POP-UP SỬA THÔNG TIN BỘ THẺ -->
+            <div id="modalEdit-<?= $deck->deckid ?>" class="modal-overlay" onclick="closeModal(this)">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2>Chỉnh sửa bộ thẻ</h2>
+                        <button class="btn-close-modal" onclick="closeModalById('modalEdit-<?= $deck->deckid ?>')">&times;</button>
+                    </div>
+                    <div class="input-group">
+                        <label>Tên bộ thẻ</label>
+                        <input type="text" id="edit-name-<?= $deck->deckid ?>" class="full-input" value="<?= Html::encode($deck->name) ?>">
+                    </div>
+                    <div class="input-group">
+                        <label>Mô tả bộ thẻ</label>
+                        <textarea id="edit-desc-<?= $deck->deckid ?>" class="full-input" rows="5"><?= Html::encode($deck->description) ?></textarea>
+                    </div>
+                    <div style="display:flex; justify-content: space-between; margin-top: 20px;">
+                        <button class="btn-delete-deck" onclick="deleteDeck(<?= $deck->deckid ?>)">Xóa bộ bài</button>
+                        <button class="btn-save" onclick="updateDeck(<?= $deck->deckid ?>)">Lưu thay đổi</button>
                     </div>
                 </div>
-            <?php endforeach; ?>
-        </div>
-    </main>
-</div>
-
+            </div>
+        <?php endforeach; ?>
+    </div>
 <!-- POP-UP TẠO MỚI BỘ THẺ -->
 <div id="modalCreate" class="modal-overlay" onclick="closeModal(this)">
     <div class="modal-content" onclick="event.stopPropagation()">

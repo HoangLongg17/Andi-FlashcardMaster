@@ -11,7 +11,7 @@ use app\models\LoginForm;
 use app\models\Deck;
 use app\models\Card;
 use app\models\ContactForm;
-
+use app\models\User;
 class SiteController extends Controller
 {
     /**
@@ -101,9 +101,22 @@ class SiteController extends Controller
         return $this->goHome();
     }
 
-    public function actionDashboard()
-    {
-        return $this->render('dashboard');
+    public function actionDashboard() {
+        if (Yii::$app->user->isGuest) {
+            return $this->redirect(['site/login']);
+        }
+
+        $user = User::findOne(Yii::$app->user->id);
+        if ($user === null) {
+            throw new \yii\web\NotFoundHttpException("Không tìm thấy user");
+        }
+
+        $streak = $user->getStreak();
+
+        return $this->render('dashboard', [
+            'user' => $user,
+            'streak' => $streak,
+        ]);
     }
 
      public function actionVocabset()
@@ -364,4 +377,14 @@ class SiteController extends Controller
         }
         return ['success' => true];
     }
+public function actionPractice()
+{
+    $userid = Yii::$app->user->id;
+    $decks = Deck::find()->where(['userid' => $userid])->with('cards.progress')->all();
+
+    return $this->render('practice', [
+        'decks' => $decks,
+    ]);
+}
+
 }

@@ -13,107 +13,78 @@ $this->title = 'Từ vựng - Andi';
 $this->registerCssFile('@web/css/dashboard.css', ['depends' => [\app\assets\AppAsset::class]]);
 $this->registerCssFile('@web/css/vocabulary.css', ['depends' => [\app\assets\AppAsset::class]]);
 ?>
+<!-- Khối thống kê -->
+<div class="vocab-stats-container">
+    <div class="stat-box"><div class="stat-title">Tổng</div><div class="stat-value"><?= $stats['total'] ?></div></div>
+    <div class="stat-box"><div class="stat-title">Thuộc</div><div class="stat-value"><?= $stats['memorized'] ?></div></div>
+    <div class="stat-box"><div class="stat-title">Chưa</div><div class="stat-value"><?= $stats['learning'] ?></div></div>
+    <div class="stat-box"><div class="stat-title">%</div><div class="stat-value"><?= $stats['percent'] ?>%</div></div>
+</div>
 
-<div class="dashboard">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <ul class="menu">
-            <li><a href="<?= Url::to(['site/dashboard']) ?>"><img src="<?= Yii::getAlias('@web') ?>/icons/home.png" alt=""> Trang chủ</a></li>
-            <li><a href="<?= Url::to(['site/vocabset']) ?>"><img src="<?= Yii::getAlias('@web') ?>/icons/vocabset.png" alt=""> Bộ thẻ</a></li>
-            <li><a href="<?= Url::to(['site/vocabulary']) ?>" class="active"><img src="<?= Yii::getAlias('@web') ?>/icons/vocabulary.png" alt=""> Từ vựng</a></li>
-            <li><a href="#"><img src="<?= Yii::getAlias('@web') ?>/icons/practice.png" alt=""> Luyện tập</a></li>
-        </ul>
-        <!-- Bổ sung Nút thu gọn và Nút Sáng/Tối -->
-        <button class="toggle-btn">&laquo;</button>
-        <div class="profile">
-            <div class="avatar"><img src="<?= Yii::getAlias('@web') ?>/images/andi-avatar.png" alt="Avatar"></div>
-            <p class="username">Nguyễn Văn A</p>
-            <div class="profile-actions">
-                <button class="btn-profile">Xem hồ sơ</button>
-                <label class="theme-switch">
-                    <input type="checkbox" id="darkModeToggle">
-                    <span class="slider"></span>
-                    <span class="label-text">Tối</span>
-                </label>
-            </div>
-        </div>
-    </aside>
+<div class="vocab-main-board">
+    <div class="vocab-controls">
+        <select class="deck-filter-select" onchange="window.location.href='<?= Url::to(['site/vocabulary']) ?>&deck_id=' + this.value">
+            <option value="">Tất cả thẻ từ vựng</option>
+            <?php foreach ($decks as $deck): ?>
+                <option value="<?= $deck->deckid ?>" <?= $currentDeckId == $deck->deckid ? 'selected' : '' ?>><?= Html::encode($deck->name) ?></option>
+            <?php endforeach; ?>
+        </select>
+        <!-- Nút dấu cộng mở Pop-up thêm thẻ hàng loạt -->
+        <button class="btn-add-huge" onclick="document.getElementById('modalAddBatch').style.display='flex'">+</button>
+    </div>
 
-    <main class="main">
-        <!-- Khối thống kê -->
-        <div class="vocab-stats-container">
-            <div class="stat-box"><div class="stat-title">Tổng</div><div class="stat-value"><?= $stats['total'] ?></div></div>
-            <div class="stat-box"><div class="stat-title">Thuộc</div><div class="stat-value"><?= $stats['memorized'] ?></div></div>
-            <div class="stat-box"><div class="stat-title">Chưa</div><div class="stat-value"><?= $stats['learning'] ?></div></div>
-            <div class="stat-box"><div class="stat-title">%</div><div class="stat-value"><?= $stats['percent'] ?>%</div></div>
-        </div>
-
-        <div class="vocab-main-board">
-            <div class="vocab-controls">
-                <select class="deck-filter-select" onchange="window.location.href='<?= Url::to(['site/vocabulary']) ?>&deck_id=' + this.value">
-                    <option value="">Tất cả thẻ từ vựng</option>
-                    <?php foreach ($decks as $deck): ?>
-                        <option value="<?= $deck->deckid ?>" <?= $currentDeckId == $deck->deckid ? 'selected' : '' ?>><?= Html::encode($deck->name) ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <!-- Nút dấu cộng mở Pop-up thêm thẻ hàng loạt -->
-                <button class="btn-add-huge" onclick="document.getElementById('modalAddBatch').style.display='flex'">+</button>
-            </div>
-
-            <table class="vocab-table">
-                <thead>
-                    <tr>
-                        <th>Mặt trước</th>
-                        <th>Mặt sau</th>
-                        <th>Loại</th>
-                        <th>Ví dụ</th>
-                        <th>Phiên âm</th>
-                        <th class="col-action" style="width: 90px; text-align: center;"></th>
+    <table class="vocab-table">
+        <thead>
+            <tr>
+                <th>Mặt trước</th>
+                <th>Mặt sau</th>
+                <th>Loại</th>
+                <th>Ví dụ</th>
+                <th>Phiên âm</th>
+                <th class="col-action" style="width: 90px; text-align: center;"></th>
+            </tr>
+        </thead>
+        <tbody id="vocabularyTableBody">
+            <?php if (empty($cards)): ?>
+                <tr>
+                    <td colspan="6" style="text-align: center; color: #999; padding: 40px;">Không có từ vựng nào để hiển thị.</td>
+                </tr>
+            <?php else: ?>
+                <?php foreach ($cards as $card): ?>
+                    <tr id="row-card-<?= $card->cardid ?>">
+                        <td style="font-weight: 700; color: #2d3748;"><?= Html::encode($card->frontcontent) ?></td>
+                        <td><?= Html::encode($card->backcontent) ?></td>
+                        <td>
+                            <?php if ($card->tags): ?>
+                                <?php foreach (explode(',', $card->tags) as $tag): ?>
+                                    <?php 
+                                        $tagStr = trim($tag);
+                                        if ($tagStr === '') continue;
+                                        
+                                        $badgeClass = 'tag-pill';
+                                        // Nếu là tag hệ thống thì có màu cam
+                                        if (in_array($tagStr, ['Cơ bản', 'Đảo ngược', 'Nhập liệu'])) {
+                                            $badgeClass .= ' tag-system';
+                                        }
+                                    ?>
+                                    <span class="<?= $badgeClass ?>"><?= Html::encode($tagStr) ?></span>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </td>
+                        <td style="font-style: italic; color: #718096;"><?= Html::encode($card->examplesentence) ?></td>
+                        <td style="font-family: monospace;"><?= Html::encode($card->pronunciation) ?></td>
+                        <td class="col-action" style="width: 90px; text-align: center;">
+                            <!-- Nút ➕: Thêm vào bộ -->
+                            <button class="btn-action-add" onclick="openAssignModal(<?= $card->cardid ?>)" title="Thêm vào bộ thẻ khác">➕</button>
+                            
+                            <!-- Nút ❌: GỠ KHỎI BỘ (Chỉ làm mất liên kết với bộ thẻ hiện hành) -->
+                            <button class="btn-delete-card-table" onclick="removeFromDeck(<?= $card->cardid ?>)" title="Gỡ thẻ khỏi bộ này">&times;</button>
+                        </td>
                     </tr>
-                </thead>
-                <tbody id="vocabularyTableBody">
-                    <?php if (empty($cards)): ?>
-                        <tr>
-                            <td colspan="6" style="text-align: center; color: #999; padding: 40px;">Không có từ vựng nào để hiển thị.</td>
-                        </tr>
-                    <?php else: ?>
-                        <?php foreach ($cards as $card): ?>
-                            <tr id="row-card-<?= $card->cardid ?>">
-                                <td style="font-weight: 700; color: #2d3748;"><?= Html::encode($card->frontcontent) ?></td>
-                                <td><?= Html::encode($card->backcontent) ?></td>
-                                <td>
-                                    <?php if ($card->tags): ?>
-                                        <?php foreach (explode(',', $card->tags) as $tag): ?>
-                                            <?php 
-                                                $tagStr = trim($tag);
-                                                if ($tagStr === '') continue;
-                                                
-                                                $badgeClass = 'tag-pill';
-                                                // Nếu là tag hệ thống thì có màu cam
-                                                if (in_array($tagStr, ['Cơ bản', 'Đảo ngược', 'Nhập liệu'])) {
-                                                    $badgeClass .= ' tag-system';
-                                                }
-                                            ?>
-                                            <span class="<?= $badgeClass ?>"><?= Html::encode($tagStr) ?></span>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </td>
-                                <td style="font-style: italic; color: #718096;"><?= Html::encode($card->examplesentence) ?></td>
-                                <td style="font-family: monospace;"><?= Html::encode($card->pronunciation) ?></td>
-                                <td class="col-action" style="width: 90px; text-align: center;">
-                                    <!-- Nút ➕: Thêm vào bộ -->
-                                    <button class="btn-action-add" onclick="openAssignModal(<?= $card->cardid ?>)" title="Thêm vào bộ thẻ khác">➕</button>
-                                    
-                                    <!-- Nút ❌: GỠ KHỎI BỘ (Chỉ làm mất liên kết với bộ thẻ hiện hành) -->
-                                    <button class="btn-delete-card-table" onclick="removeFromDeck(<?= $card->cardid ?>)" title="Gỡ thẻ khỏi bộ này">&times;</button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-    </main>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </tbody>
+    </table>
 </div>
 
 <!-- POP-UP 1: THÊM THẺ HÀNG LOẠT -->

@@ -24,6 +24,7 @@ class AppAsset extends AssetBundle
         'css/style.css',
         'css/dashboard.css',
         'css/header.css',
+        'css/practice.css',
     ];
     public $js = [
         'js/script.js',
