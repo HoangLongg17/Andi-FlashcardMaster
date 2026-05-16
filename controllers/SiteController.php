@@ -12,10 +12,7 @@ use app\models\User;
 use app\models\SignupForm;
 use yii\helpers\FileHelper;
 
-/* * =========================================================================
- * KHAI BÁO CÁC MODEL QUAN TRỌNG ĐỂ FIX LỖI "CLASS DECK NOT FOUND"
- * =========================================================================
- */
+
 use app\models\Deck;
 use app\models\Card;
 use app\models\CardProgress;
@@ -25,21 +22,15 @@ use app\helpers\SM2Helper;
 
 class SiteController extends Controller
 {
-    // Mặc định dùng layout main cho dashboard/vocabset/vocabulary
     public $layout = 'main';
 
-    /**
-     * beforeAction: Thiết lập cấu hình tiền xử lý.
-     * ĐÃ BỔ SUNG: Tắt CSRF cho AJAX để các chức năng Xóa/Sửa của bạn không bị lỗi "Kết nối máy chủ".
-     */
+    
     public function beforeAction($action)
     {
-        // Vô hiệu hóa kiểm tra CSRF cho các yêu cầu AJAX (Fetch)
         if (strpos($action->id, 'ajax-') === 0 || Yii::$app->request->isAjax) {
             $this->enableCsrfValidation = false;
         }
 
-        // Dành riêng layout cho các page public (landing/login/signup)
         if (in_array($action->id, ['index', 'login', 'signup'])) {
             $this->layout = 'landing';
         }
@@ -47,15 +38,12 @@ class SiteController extends Controller
         return parent::beforeAction($action);
     }
 
-    /**
-     * Cấu hình quyền truy cập (GIỮ NGUYÊN PHONG CÁCH BẢN GỐC)
-     */
+    
     public function behaviors()
     {
         return [
             'access' => [
                 'class' => AccessControl::class,
-                // ĐÃ CẬP NHẬT: Bảo vệ đầy đủ các Action quan trọng
                 'only' => [
                     'logout', 'dashboard', 'signup', 'login', 'vocabset', 'vocabulary',
                     'practice', 'study-deck',
@@ -75,16 +63,15 @@ class SiteController extends Controller
                             'ajax-update-card', 'ajax-update-profile',
                         ],
                         'allow' => true,
-                        'roles' => ['@'], // Chỉ cho phép người đã đăng nhập
+                        'roles' => ['@'], 
                     ],
                     [
                         'actions' => ['signup', 'login', 'index', 'error', 'captcha', 'auth'],
                         'allow' => true,
-                        'roles' => ['?'], // Chỉ cho phép khách (chưa đăng nhập)
+                        'roles' => ['?'], 
                     ],
                 ],
-                // Xử lý khi người dùng cố tình truy cập trang bị cấm hoặc hết phiên
-                // ĐÃ TỐI ƯU: Tránh lỗi xoay vòng 404 cho các yêu cầu AJAX
+                
                 'denyCallback' => function ($rule, $action) {
                     if (Yii::$app->request->isAjax) {
                         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -98,15 +85,13 @@ class SiteController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    'logout' => ['post', 'get'], // Hỗ trợ cả hai để nút thoát của bạn luôn chạy
+                    'logout' => ['post', 'get'], 
                 ],
             ],
         ];
     }
 
-    /**
-     * Các Action mở rộng (GIỮ NGUYÊN BẢN GỐC)
-     */
+  
     public function actions()
     {
         return [
@@ -123,10 +108,7 @@ class SiteController extends Controller
         ];
     }
 
-    /**
-     * Trang chủ hiển thị Landing Page
-     * Nếu đã đăng nhập, redirect to dashboard
-     */
+  
     public function actionIndex()
     {
         // Nếu đã đăng nhập, redirect to dashboard
@@ -138,29 +120,19 @@ class SiteController extends Controller
         return $this->render('index');
     }
 
-    /* =========================================================================
-       PHẦN 1: LOGIC ĐĂNG NHẬP, ĐĂNG KÝ VÀ TÀI KHOẢN (GIỮ NGUYÊN PHONG CÁCH BẠN)
-       ========================================================================= */
-
-    /**
-     * Logic Đăng nhập hệ thống
-     */
+   
     public function actionLogin()
     {
-        // Nếu đã đăng nhập thành công trước đó, đẩy vào Dashboard luôn
         if (!Yii::$app->user->isGuest) {
             return $this->redirect(['site/dashboard']);
         }
 
         $model = new LoginForm();
 
-        // Kiểm tra dữ liệu POST gửi lên
         if ($model->load(Yii::$app->request->post())) {
             if ($model->login()) {
-                // ĐĂNG NHẬP THÀNH CÔNG -> Chuyển hướng
                 return $this->redirect(['site/dashboard']);
             } else {
-                // Nếu login() trả về false, lỗi sẽ nằm trong $model->errors
                 Yii::error("Đăng nhập thất bại cho email: " . $model->email);
             }
         }
@@ -171,12 +143,9 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Trang Dashboard (Bàn làm việc)
-     */
+ 
     public function actionDashboard()
     {
-        // Kiểm tra lại một lần nữa cho chắc chắn
         if (Yii::$app->user->isGuest) {
             return $this->redirect(['site/login']);
         }
@@ -184,9 +153,7 @@ class SiteController extends Controller
         return $this->render('dashboard');
     }
 
-    /**
-     * Xử lý sau khi Google Auth thành công
-     */
+    
     public function onAuthSuccess($client)
     {
         $attributes = $client->getUserAttributes();
@@ -210,28 +177,22 @@ class SiteController extends Controller
         Yii::$app->user->login($user, 3600 * 24 * 30);
     }
     
-    /**
-     * Đăng xuất khỏi hệ thống
-     */
+  
     public function actionLogout()
     {
         Yii::$app->user->logout();
-        return $this->redirect(['site/login']); // Thoát xong đưa về trang Login
+        return $this->redirect(['site/login']); 
     }
 
-    /**
-     * Trang Đăng ký tài khoản người dùng mới
-     */
+    
     public function actionSignup()
     {
-        // 1. Nếu đã đăng nhập thì không cho vào trang đăng ký nữa
         if (!Yii::$app->user->isGuest) {
             return $this->redirect(['site/dashboard']);
         }
 
         $model = new SignupForm();
 
-        // 2. Xử lý khi người dùng nhấn nút Submit (POST)
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->signup()) {
                 // Đăng ký thành công, tự động đăng nhập luôn
@@ -241,40 +202,29 @@ class SiteController extends Controller
             }
         }
 
-        // 3. Hiển thị form đăng ký (GET)
         return $this->render('signup', [
             'model' => $model,
         ]);
     }
 
-    /* =========================================================================
-       PHẦN 2: QUẢN LÝ DỮ LIỆU ĐA NGƯỜI DÙNG (MULTITENANCY)
-       ========================================================================= */
-
-    /**
-     * Trang hiển thị danh sách các bộ thẻ của người dùng
-     */
+ 
     public function actionVocabset()
     {
-        // Lấy đúng ID của người đang đăng nhập thay vì số 1 cố định
         $userId = Yii::$app->user->id;
         $decks = Deck::find()
             ->where(['userid' => $userId])
-            ->with(['cards.progress']) // Eager load dữ liệu cards và progress từ DB
+            ->with(['cards.progress']) 
             ->orderBy(['createdat' => SORT_DESC])
             ->all();
 
-        // Tính quota còn lại hôm nay cho mỗi deck
         $today = date('Y-m-d');
         $deckQuotas = [];
         
         foreach ($decks as $deck) {
-            // Lấy cài đặt bộ thẻ
             $deckSettings = DeckSettings::findOne(['deckid' => $deck->deckid]) ?: new DeckSettings();
             $maxNewCards = $deckSettings->maxnewcardsperday ?? 20;
             $maxReviewCards = $deckSettings->maxreviewcardsperday ?? 200;
 
-            // Đếm đã học hôm nay
             $todayNewCount = ReviewLog::find()
                 ->joinWith('card')
                 ->joinWith('cardProgress')
@@ -294,7 +244,6 @@ class SiteController extends Controller
             $newQuotaRemaining = $maxNewCards - $todayNewCount;
             $reviewQuotaRemaining = $maxReviewCards - $todayReviewCount;
 
-            // Lưu quota vào array (thay vì set vào deck object)
             $deckQuotas[$deck->deckid] = [
                 'newRemaining' => max(0, $newQuotaRemaining),
                 'reviewRemaining' => max(0, $reviewQuotaRemaining),
@@ -307,30 +256,24 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Trang quản lý từ vựng chi tiết
-     */
+    
     public function actionVocabulary($deck_id = null)
     {
         $userId = Yii::$app->user->id;
 
-        // 1. Lấy danh sách bộ thẻ của CHÍNH USER để làm Bộ lọc (Filter)
         $decks = Deck::find()
             ->where(['userid' => $userId])
             ->orderBy(['createdat' => SORT_DESC])
             ->all();
 
-        // 2. Truy vấn danh sách thẻ để hiển thị trong bảng
         $query = Card::find()->where(['userid' => $userId])->with('progress')->orderBy(['createdat' => SORT_DESC]);
 
-        // Nếu người dùng có chọn bộ lọc
         if ($deck_id) {
             $query->andWhere(['deckid' => $deck_id]);
         }
 
         $cards = $query->all();
 
-        // 3. Tính SRS Level Distribution (phân bố từ vựng theo cấp độ ôn tập)
         $srsByLevel = [
             0 => ['name' => 'Từ mới', 'count' => 0, 'nextReview' => 'Học ngay', 'color' => '#2196F3'],
             1 => ['name' => 'Sau 1 ngày', 'count' => 0, 'nextReview' => '', 'color' => '#FF9800'],
@@ -382,17 +325,10 @@ class SiteController extends Controller
         ]);
     }
 
-    /* =========================================================================
-       PHẦN 3: CÁC API AJAX - ĐÃ FIX LỖI NÚT XÓA / GỠ THẺ (NHẬN ID CHÍNH XÁC)
-       ========================================================================= */
-
-    /**
-     * AJAX: XÓA VĨNH VIỄN MỘT THẺ KHỎI HỆ THỐNG
-     */
+   
     public function actionAjaxDeleteCard($id = null)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        // ĐÃ SỬA: Chấp nhận ID từ POST body để khớp với yêu cầu Fetch từ giao diện
         $id = $id ?? Yii::$app->request->post('id') ?? Yii::$app->request->get('id');
         $userId = Yii::$app->user->id;
 
@@ -428,13 +364,9 @@ class SiteController extends Controller
             $errorMsg = reset($model->errors)[0] ?? 'Lỗi khi cập nhật dữ liệu.';
             return ['success' => false, 'message' => $errorMsg];
         }
-    /**
-     * AJAX: GỠ THẺ KHỎI BỘ (SET DECKID = NULL)
-     * Thẻ vẫn tồn tại trong kho nhưng không còn thuộc bộ bài nào.
-     */
+  
     public function actionAjaxRemoveFromDeck($id = null) {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        // ĐÃ SỬA: Chấp nhận ID từ POST body để tránh lỗi tham số rỗng
         $id = $id ?? Yii::$app->request->post('id') ?? Yii::$app->request->get('id');
         $userId = Yii::$app->user->id;
 
@@ -453,26 +385,22 @@ class SiteController extends Controller
         $deckId = Yii::$app->request->post('deckId');
         $userId = Yii::$app->user->id;
 
-        // 1. Tìm bộ bài gốc
         $originalDeck = Deck::find()->where(['deckid' => $deckId])->with('cards')->one();
 
         if (!$originalDeck) {
             return ['success' => false, 'message' => 'Không tìm thấy bộ bài với ID: ' . $deckId];
         }
 
-        // 2. Chặn nếu nhập bộ bài của chính mình (Tránh rác dữ liệu)
         if ($originalDeck->userid == $userId) {
             return ['success' => false, 'message' => 'Bạn không thể nhập bộ bài của chính mình.'];
         }
 
-        // 3. Tiến hành sao chép bộ bài
         $newDeck = new Deck();
         $newDeck->name = $originalDeck->name . " (Đã nhập)";
         $newDeck->description = $originalDeck->description;
         $newDeck->userid = $userId; 
 
         if ($newDeck->save()) {
-            // 4. Sao chép từng thẻ một (Copy toàn bộ thông tin thay vì chỉ mặt trước/sau)
             foreach ($originalDeck->cards as $card) {
                 $newCard = new Card();
                 $newCard->userid = $userId;
@@ -483,16 +411,14 @@ class SiteController extends Controller
                 $newCard->pronunciation = $card->pronunciation;
                 $newCard->examplesentence = $card->examplesentence;
                 $newCard->tags = $card->tags;
-                $newCard->save(false); // Dùng false để bỏ qua validation nếu cần thiết cho nhanh
+                $newCard->save(false); 
             }
             return ['success' => true, 'message' => 'Đã nhập thành công bộ bài: ' . $originalDeck->name];
         }
 
         return ['success' => false, 'message' => 'Có lỗi xảy ra khi lưu dữ liệu bộ bài mới.'];
     }
-    /**
-     * AJAX: Cập nhật thông tin bộ thẻ (Tên/Mô tả)
-     */
+   
      public function actionAjaxUpdateDeck($id = null)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -507,7 +433,6 @@ class SiteController extends Controller
         $data = Yii::$app->request->post();
         $newName = trim($data['name'] ?? $model->name);
 
-        // KIỂM TRA TRÙNG TÊN KHI ĐỔI TÊN
         if ($newName !== $model->name) {
             $exists = Deck::findOne(['name' => $newName, 'userid' => $userId]);
             if ($exists) {
@@ -528,9 +453,7 @@ class SiteController extends Controller
             return ['success' => false, 'message' => 'Lỗi cơ sở dữ liệu, không thể lưu.'];
         }
     }
-    /**
-     * AJAX: Xóa toàn bộ một bộ bài
-     */
+  
     public function actionAjaxDeleteDeck($id = null)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -542,9 +465,7 @@ class SiteController extends Controller
         return ['success' => false];
     }
 
-    /**
-     * AJAX: Tạo một bộ bài hoàn toàn mới
-     */
+  
    public function actionAjaxCreateDeck()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -552,7 +473,6 @@ class SiteController extends Controller
         $name = trim($data['name'] ?? 'Bộ bài mới');
         $userId = Yii::$app->user->id; 
 
-        // KIỂM TRA TRÙNG TÊN RÕ RÀNG NGAY TỪ CONTROLLER
         $exists = Deck::findOne(['name' => $name, 'userid' => $userId]);
         if ($exists) {
             return ['success' => false, 'message' => 'Bạn đã có bộ thẻ với tên này rồi. Vui lòng chọn tên khác!'];
@@ -560,13 +480,11 @@ class SiteController extends Controller
 
         $model = new Deck();
         $model->name = $name;
-        // Bắt buộc ép kiểu string, tránh null gây lỗi DB
         $model->description = trim($data['description'] ?? '');
         $model->userid = $userId; 
         
         try {
             if ($model->save()) {
-                // Tự động tạo DeckSettings mặc định luôn để tránh lỗi các trang khác
                 $setting = new DeckSettings();
                 $setting->deckid = $model->deckid;
                 $setting->save(false);
@@ -574,19 +492,15 @@ class SiteController extends Controller
                 return ['success' => true, 'message' => 'Tạo bộ thẻ mới thành công!'];
             }
             
-            // Xử lý báo lỗi chi tiết nếu Model validate thất bại
             $errorMsg = reset($model->errors)[0] ?? 'Lỗi không xác định khi tạo bộ thẻ.';
             return ['success' => false, 'message' => 'Lỗi dữ liệu: ' . $errorMsg];
             
         } catch (\Exception $e) {
-            // IN RA MÃ LỖI GỐC CỦA SQL ĐỂ DEBUG (CHỈ DÙNG KHI DEV)
             return ['success' => false, 'message' => 'Lỗi DB: ' . $e->getMessage()];
         }
     }
 
-    /**
-     * AJAX: Test endpoint - để kiểm tra AJAX có hoạt động không
-     */
+  
     public function actionAjaxTest()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -594,14 +508,11 @@ class SiteController extends Controller
         return ['success' => true, 'message' => 'AJAX working!', 'time' => date('Y-m-d H:i:s')];
     }
 
-    /**
-     * AJAX: Cập nhật Profile (Họ tên, Mật khẩu, Avatar)
-     */
+
     public function actionAjaxUpdateProfile()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         
-        // Debug: Log request
         Yii::info('AJAX Update Profile called', __METHOD__);
         
         if (Yii::$app->user->isGuest) {
@@ -625,7 +536,6 @@ class SiteController extends Controller
             Yii::info('Password updated', __METHOD__);
         }
 
-        // Xử lý lưu ảnh từ chuỗi Base64
         if (!empty($post['avatar_base64'])) {
             try {
                 $uploadPath = Yii::getAlias('@webroot/uploads/avatars');
@@ -659,9 +569,7 @@ class SiteController extends Controller
         return ['success' => false, 'message' => 'Không thể lưu thông tin.'];
     }
 
-    /**
-     * AJAX: Lưu thẻ hàng loạt từ trang thêm thẻ
-     */
+ 
     public function actionAjaxSaveBatchCards()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -685,9 +593,6 @@ class SiteController extends Controller
         }
     }
 
-    /**
-     * Hàm phụ trợ lưu bản ghi thẻ
-     */
     private function saveCardInstance($deckId, $data, $type, $userId) {
         $model = new Card();
         $model->userid = $userId;
@@ -702,9 +607,7 @@ class SiteController extends Controller
         if (!$model->save()) throw new \Exception("Lỗi lưu dữ liệu thẻ.");
     }
 
-    /**
-     * AJAX: Gắn một thẻ có sẵn vào một bộ bài khác
-     */
+  
     public function actionAjaxAssignCardToDeck() {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $cardId = Yii::$app->request->post('cardId');
@@ -729,34 +632,24 @@ class SiteController extends Controller
         return ['success' => true];
     }
 
-    /* =========================================================================
-       PHẦN 4: LUYỆN TẬP - PRACTICE (FLASHCARD STUDY) VỚI SM-2
-       ========================================================================= */
 
-    /**
-     * Trang Luyện tập: Hiển thị danh sách bộ thẻ với thống kê
-     */
     public function actionPractice()
     {
         $userId = Yii::$app->user->id;
         $today = date('Y-m-d');
         
-        // Lấy tất cả bộ thẻ của user
         $decks = Deck::find()
             ->where(['userid' => $userId])
             ->with(['cards', 'cards.progress'])
             ->orderBy(['createdat' => SORT_DESC])
             ->all();
 
-        // Tính toán thống kê cho mỗi bộ thẻ (áp dụng quota như Anki)
         $deckStats = [];
         foreach ($decks as $deck) {
-            // Lấy cài đặt bộ thẻ
             $deckSettings = DeckSettings::findOne(['deckid' => $deck->deckid]) ?: new DeckSettings();
             $maxNewCards = $deckSettings->maxnewcardsperday ?? 20;
             $maxReviewCards = $deckSettings->maxreviewcardsperday ?? 200;
 
-            // Đếm đã học hôm nay (từ ReviewLog)
             $todayNewCount = ReviewLog::find()
                 ->joinWith('card')
                 ->joinWith('cardProgress')
@@ -773,11 +666,9 @@ class SiteController extends Controller
                 ->andWhere(['cardprogress.status' => 2])
                 ->count();
 
-            // Tính quota có sẵn
             $newQuotaRemaining = $maxNewCards - $todayNewCount;
             $reviewQuotaRemaining = $maxReviewCards - $todayReviewCount;
 
-            // Đếm thẻ cần ôn với quota limit
             $new = 0;
             $learning = 0;
             $review = 0;
@@ -785,29 +676,24 @@ class SiteController extends Controller
             foreach ($deck->cards as $card) {
                 $progress = $card->progress;
                 if (!$progress) {
-                    // Thẻ mới chưa học - check quota
                     if ($newQuotaRemaining > 0) {
                         $new++;
                         $newQuotaRemaining--;
                     }
                 } else {
                     $status = $progress->status;
-                    // Check due: before end of today
                     $isDue = strtotime($progress->duedate) <= strtotime($today . ' 23:59:59');
                     
                     if ($status == 0) {
-                        // Thẻ mới - check quota
                         if ($isDue && $newQuotaRemaining > 0) {
                             $new++;
                             $newQuotaRemaining--;
                         }
                     } elseif ($status == 1) {
-                        // Thẻ đang học - no quota limit
                         if ($isDue) {
                             $learning++;
                         }
                     } elseif ($status == 2) {
-                        // Thẻ ôn tập - check quota
                         if ($isDue && $reviewQuotaRemaining > 0) {
                             $review++;
                             $reviewQuotaRemaining--;
@@ -830,9 +716,7 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Trang Học bộ thẻ: Hiển thị flashcard và xử lý SM-2
-     */
+   
     public function actionStudyDeck($deckid = null)
     {
         if (!$deckid) return $this->redirect(['site/practice']);
@@ -842,24 +726,20 @@ class SiteController extends Controller
 
         if (!$deck) return $this->redirect(['site/practice']);
 
-        // Lấy tất cả bộ thẻ của user (cho sidebar)
         $decks = Deck::find()
             ->where(['userid' => $userId])
             ->orderBy(['createdat' => SORT_DESC])
             ->all();
 
-        // Lấy các thẻ cần ôn tập hôm nay
         $cardsToStudy = Card::find()
             ->where(['userid' => $userId, 'deckid' => $deckid])
             ->with('progress')
             ->all();
 
-        // Lấy cài đặt bộ thẻ để áp dụng daily limit (như Anki)
         $deckSettings = DeckSettings::findOne(['deckid' => $deckid]) ?: new DeckSettings();
         $maxNewCards = $deckSettings->maxnewcardsperday ?? 20;
         $maxReviewCards = $deckSettings->maxreviewcardsperday ?? 200;
 
-        // Đếm thẻ đã học hôm nay
         $today = date('Y-m-d');
         $todayNewCount = ReviewLog::find()
             ->joinWith('card')
@@ -877,11 +757,9 @@ class SiteController extends Controller
             ->andWhere(['cardprogress.status' => 2])
             ->count();
 
-        // Tính quota còn lại
         $newQuotaRemaining = $maxNewCards - $todayNewCount;
         $reviewQuotaRemaining = $maxReviewCards - $todayReviewCount;
 
-        // Lọc thẻ cần ôn (sắp xếp ưu tiên: mới > learning > review due)
         $dueSoon = [];
         $new = [];
         $learning = [];
@@ -892,7 +770,6 @@ class SiteController extends Controller
             if (!$progress) {
                 $new[] = $card;
             } else {
-                // Check due: thẻ phải due trước cuối hôm nay (giống vocabset)
                 $isDue = strtotime($progress->duedate) <= strtotime($today . ' 23:59:59');
                 if ($progress->status == 0) {
                     if ($isDue) $dueSoon[] = $card;
@@ -907,7 +784,6 @@ class SiteController extends Controller
             }
         }
 
-        // Áp dụng daily limit: lọc các thẻ available theo quota
         $availableDue = [];
         foreach ($dueSoon as $card) {
             $progress = $card->progress;
@@ -926,7 +802,6 @@ class SiteController extends Controller
             }
         }
 
-        // Additional: Filter $new cards by quota (những thẻ chưa học, chưa due)
         $availableNew = [];
         foreach ($new as $card) {
             if ($newQuotaRemaining > 0) {
@@ -935,14 +810,10 @@ class SiteController extends Controller
             }
         }
 
-        // Lọc thẻ learning chưa due (không bị quota limit)
         $availableLearning = $learning;
 
-        // Ưu tiên: thẻ sắp đến hạn > thẻ mới > đang học
-        // CHỈ show những thẻ DUE hôm nay, chưa học (còn quota), hoặc đang học
         $priorityQueue = array_merge($availableDue, $availableNew, $availableLearning);
 
-        // Lấy thẻ đầu tiên (hoặc redirect nếu không có)
         if (empty($priorityQueue)) {
             Yii::$app->session->setFlash('info', 'Hôm nay bạn đã hoàn thành tất cả bộ này! 🎉');
             return $this->redirect(['site/practice']);
@@ -962,9 +833,7 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * AJAX: Lấy thẻ tiếp theo cần học
-     */
+    
     public function actionAjaxGetNextCard()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -972,12 +841,10 @@ class SiteController extends Controller
         $currentCardId = Yii::$app->request->post('currentCardId');
         $userId = Yii::$app->user->id;
 
-        // Get deck settings for daily limits
         $deckSettings = DeckSettings::findOne(['deckid' => $deckId]) ?: new DeckSettings();
         $maxNewCards = $deckSettings->maxnewcardsperday ?? 20;
         $maxReviewCards = $deckSettings->maxreviewcardsperday ?? 200;
 
-        // Count today's review counts (from ReviewLog where reviewdate is today)
         $today = date('Y-m-d');
         $todayReviews = ReviewLog::find()
             ->joinWith('card')
@@ -985,7 +852,6 @@ class SiteController extends Controller
             ->andWhere(['cards.deckid' => $deckId, 'cards.userid' => $userId])
             ->count();
 
-        // Breakdown of today's reviews by card status
         $todayNewCount = ReviewLog::find()
             ->joinWith('card')
             ->joinWith('cardProgress')
@@ -1002,7 +868,6 @@ class SiteController extends Controller
             ->andWhere(['cardprogress.status' => 2])
             ->count();
 
-        // Lấy thẻ tiếp theo từ queue (tính lại từ DB)
         $cardsToStudy = Card::find()
             ->where(['userid' => $userId, 'deckid' => $deckId])
             ->with('progress')
@@ -1018,28 +883,23 @@ class SiteController extends Controller
             if (!$progress) {
                 $new[] = $card;
             } else {
-                // FIX: Kiểm tra isDue để chỉ hiển thị thẻ đã đến hạn học (không hiển thị thẻ được lên lịch tương lai)
                 if ($progress->status == 0) {
-                    $dueSoon[] = $card; // Thẻ mới luôn hiển thị
+                    $dueSoon[] = $card; 
                 } elseif ($progress->status == 1 && $progress->isDue()) {
-                    $learning[] = $card; // Thẻ đang learn, chỉ nếu đã đến hạn
+                    $learning[] = $card; 
                 } elseif ($progress->status == 2 && $progress->isDue()) {
-                    $dueSoon[] = $card; // Thẻ review, chỉ nếu đã đến hạn
+                    $dueSoon[] = $card; 
                 }
             }
         }
 
-        // Apply daily limits: Filter due cards by daily quotas
-        // Nhưng nếu user đã vào study session, không nên block bởi quota
-        // Chỉ add status như bình thường
+   
         $availableDue = $dueSoon;
         $availableNew = $new;
 
-        // Ưu tiên: thẻ review > thẻ mới > đang học
         $priorityQueue = array_merge($availableDue, $availableNew, $learning);
 
-        // Tìm thẻ tiếp theo
-        // Nếu chỉ có 1 thẻ và nó vừa được grade, sẽ return lại nó để show tiếp
+        
         $nextCard = null;
         $skipFirst = true;
         foreach ($priorityQueue as $card) {
@@ -1047,18 +907,15 @@ class SiteController extends Controller
                 $nextCard = $card;
                 break;
             } elseif ($card->cardid == $currentCardId && !$skipFirst) {
-                // Thẻ đó xuất hiện lần 2, có thể return nó
                 $nextCard = $card;
                 break;
             }
         }
         
-        // Nếu không tìm thấy thẻ khác, check xem currentCard có trong queue không
-        // Nếu có = hỏi có thể show lại
+   
         if (!$nextCard) {
             foreach ($priorityQueue as $card) {
                 if ($card->cardid == $currentCardId) {
-                    // Thẻ hiện tại vẫn trong queue (ví dụ vừa score "Again" thành Learning)
                     $nextCard = $card;
                     break;
                 }
@@ -1066,7 +923,6 @@ class SiteController extends Controller
         }
 
         if (!$nextCard) {
-            // Hết thẻ, quay lại practice
             return [
                 'success' => true,
                 'finished' => true,
@@ -1074,7 +930,6 @@ class SiteController extends Controller
             ];
         }
 
-        // Tìm vị trí của thẻ tiếp theo trong priorityQueue
         $cardIndex = 1;
         foreach ($priorityQueue as $idx => $card) {
             if ($card->cardid == $nextCard->cardid) {
@@ -1105,9 +960,7 @@ class SiteController extends Controller
         ];
     }
 
-    /**
-     * AJAX: Đánh giá thẻ và cập nhật tiến độ theo SM-2
-     */
+
     public function actionAjaxGradeCard()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -1116,13 +969,11 @@ class SiteController extends Controller
         $grade = Yii::$app->request->post('grade'); // 0-4
         $userId = Yii::$app->user->id;
 
-        // Kiểm tra thẻ tồn tại và thuộc user
         $card = Card::findOne(['cardid' => $cardId, 'userid' => $userId]);
         if (!$card) {
             return ['success' => false, 'message' => 'Thẻ không tìm thấy.'];
         }
 
-        // Lấy hoặc tạo progress record
         $progress = CardProgress::findOne(['cardid' => $cardId]);
         if (!$progress) {
             $progress = new CardProgress();
@@ -1134,7 +985,6 @@ class SiteController extends Controller
             $progress->repetitions = 0;
         }
 
-        // Lưu lịch sử đánh giá
         $reviewLog = new \app\models\ReviewLog();
         $reviewLog->cardid = $cardId;
         $reviewLog->grade = $grade;
@@ -1151,7 +1001,6 @@ class SiteController extends Controller
             $progress->lapses ?? 0
         );
 
-        // Cập nhật progress
         $progress->status = $sm2Result['status'];
         $progress->repetitions = $sm2Result['repetitions'];
         $progress->intervaldays = $sm2Result['interval'];

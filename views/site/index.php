@@ -1,5 +1,4 @@
 <?php
-// Thêm dòng này vào để sửa lỗi "Class Url not found"
 use yii\helpers\Url;
 
 $this->title = 'Andi - Học từ vựng';
@@ -17,9 +16,7 @@ $this->title = 'Andi - Học từ vựng';
         <span class="highlight">Phương pháp Flashcard</span> thông minh giúp bạn ghi nhớ <span class="highlight">gấp 3 lần</span> phương pháp học tập thông thường
       </p>
       <div class="hero-buttons">
-        <!-- Nút bắt đầu học trỏ đến trang đăng ký -->
         <a href="<?= Url::to(['site/signup']) ?>" class="btn-primary" style="text-decoration: none; display: inline-block;">Bắt đầu học miễn phí →</a>
-        <!-- Link "Tôi đã có tài khoản" trỏ đến trang đăng nhập -->
         <a href="<?= Url::to(['site/login']) ?>" class="btn-secondary" style="text-decoration: none; display: inline-block;">Tôi đã có tài khoản</a>
       </div>
     </div>

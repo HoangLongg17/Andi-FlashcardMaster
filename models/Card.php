@@ -22,9 +22,7 @@ use yii\db\ActiveRecord;
  */
 class Card extends ActiveRecord
 {
-    /**
-     * Tên bảng trong database
-     */
+  
     public static function tableName()
     {
         return 'cards';

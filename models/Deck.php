@@ -18,17 +18,13 @@ use yii\db\ActiveRecord;
  */
 class Deck extends ActiveRecord
 {
-    /**
-     * Tên bảng trong database
-     */
+    
     public static function tableName()
     {
         return 'decks';
     }
 
-    /**
-     * Quy tắc kiểm tra dữ liệu
-     */
+    
     public function rules()
     {
         return [
@@ -38,10 +34,8 @@ class Deck extends ActiveRecord
             [['createdat'], 'safe'],     // ĐÃ ĐỔI THÀNH createdat (không có gạch dưới)
             [['name'], 'string', 'max' => 255],
             
-            // Sửa lại targetAttribute của User cho khớp với cột userid trong bảng users
             [['userid'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['userid' => 'userid']],
             
-            // CHẶN TRÙNG TÊN BỘ THẺ THEO USER
             [
                 ['name'], 
                 'unique', 
@@ -51,9 +45,7 @@ class Deck extends ActiveRecord
         ];
     }
 
-    /**
-     * Thiết lập quan hệ: Một bộ thẻ (Deck) có nhiều Thẻ (Cards)
-     */
+
     public function getCards()
     {
         return $this->hasMany(Card::class, ['deckid' => 'deckid']);
