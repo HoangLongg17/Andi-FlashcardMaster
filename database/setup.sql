@@ -1,9 +1,7 @@
 create database if not exists andiflashcarddb character set utf8mb4 collate utf8mb4_unicode_ci;
 use andiflashcarddb;
 
--- ==========================================
--- bảng 1: users (tài khoản người dùng)
--- ==========================================
+
 create table users (
     userid int auto_increment primary key,
     email varchar(255) unique not null,
@@ -17,12 +15,9 @@ create table users (
     createdat datetime default current_timestamp
 ) engine=innodb;
 
--- tạo index cho googleid
 create unique index uq_users_googleid on users(googleid);
 
--- ==========================================
--- bảng 2: dailystats (thống kê theo ngày)
--- ==========================================
+
 create table dailystats (
     statid int auto_increment primary key,
     userid int not null,
@@ -33,9 +28,7 @@ create table dailystats (
         references users(userid) on delete cascade
 ) engine=innodb;
 
--- ==========================================
--- bảng 3: decks (bộ thẻ)
--- ==========================================
+
 create table decks (
     deckid int auto_increment primary key,
     userid int not null,
@@ -47,9 +40,7 @@ create table decks (
 	 constraint uq_user_deckname unique (userid, name) 
 ) engine=innodb;
 
--- ==========================================
--- bảng 4: decksettings (cài đặt của bộ thẻ)
--- ==========================================
+
 create table decksettings (
     settingid int auto_increment primary key,
     deckid int unique not null,
@@ -59,9 +50,7 @@ create table decksettings (
         references decks(deckid) on delete cascade
 ) engine=innodb;
 
--- ==========================================
--- bảng 5: cards (thẻ ghi nhớ) - ĐÃ CẬP NHẬT USERID
--- ==========================================
+
 create table cards (
     cardid int auto_increment primary key,
     userid int not null comment 'Chủ sở hữu của thẻ (Bắt buộc để phân biệt thẻ khi gỡ khỏi bộ)',
@@ -80,9 +69,7 @@ create table cards (
         references decks(deckid) on delete set null
 ) engine=innodb;
 
--- ==========================================
--- bảng 6: cardprogress (tiến độ học & thuật toán srs)
--- ==========================================
+
 create table cardprogress (
     progressid int auto_increment primary key,
     cardid int unique not null,
@@ -96,9 +83,6 @@ create table cardprogress (
         references cards(cardid) on delete cascade
 ) engine=innodb;
 
--- ==========================================
--- bảng 7: reviewlogs (lịch sử ôn tập)
--- ==========================================
 create table reviewlogs (
     logid int auto_increment primary key,
     cardid int not null,
@@ -109,35 +93,27 @@ create table reviewlogs (
         references cards(cardid) on delete cascade
 ) engine=innodb;
 
--- ==========================================
--- DỮ LIỆU MẪU
--- ==========================================
 
--- 1. Thêm người dùng (Giữ nguyên Hash Password của bạn)
 insert into users (email, passwordhash, displayname, currentstreak, isemailverified)
 values 
 ('nguyenvana@gmail.com', '123456', 'nguyễn văn a', 3, 1), 
 ('tranthib@gmail.com', '123456', 'trần thị b', 0, 1);
 
--- 2. Thêm thống kê ngày
 insert into dailystats (userid, studydate, cardsstudied, timespentminutes)
 values 
 (1, date_sub(current_date, interval 2 day), 20, 15), 
 (1, date_sub(current_date, interval 1 day), 35, 20), 
 (1, current_date, 10, 8);
 
--- 3. Thêm bộ thẻ
 insert into decks (userid, name, description)
 values 
 (1, '100 từ vựng toeic', 'bộ từ vựng cơ bản thường gặp trong bài thi toeic'), 
 (1, 'động từ bất quy tắc', 'cần học thuộc lòng để chia thì'),                 
 (2, 'giải phẫu học cơ sở', 'dành cho sinh viên y khoa năm 1');
 
--- 4. Thêm cài đặt bộ thẻ
 insert into decksettings (deckid, maxnewcardsperday, maxreviewsperday)
 values (1, 20, 100), (2, 10, 50), (3, 30, 200);
 
--- 5. Thêm thẻ ghi nhớ (ĐÃ BỔ SUNG CỘT USERID CHO TỪNG THẺ)
 insert into cards (userid, deckid, cardtype, frontcontent, backcontent, pronunciation, audiourl, examplesentence, tags)
 values 
 (1, 1, 1, 'accommodate (v)', 'cung cấp chỗ ở, đáp ứng nhu cầu', '/əˈkɒm.ə.deɪt/', '/audio/accommodate.mp3', 'the hotel can accommodate up to 500 guests.', 'toeic, verb'),
@@ -159,7 +135,6 @@ values
 (2, 3, 1, 'sternum', 'xương ức', null, null, 'the ribs are attached to the sternum.', 'anatomy, bone'),
 (2, 3, 1, 'patella', 'xương bánh chè', null, null, 'the patella protects the knee joint.', 'anatomy, bone');
 
--- 6. Thêm tiến độ học tập
 insert into cardprogress (cardid, status, duedate, intervaldays, easefactor, repetitions, lapses)
 values 
 (1, 2, date_add(now(), interval 4 day), 4.0, 2.6, 2, 0),  
@@ -181,7 +156,6 @@ values
 (17, 0, now(), 0, 2.5, 0, 0),
 (18, 0, now(), 0, 2.5, 0, 0);
 
--- 7. Thêm lịch sử ôn tập
 insert into reviewlogs (cardid, grade, reviewdate, durationms)
 values 
 (1, 3, date_sub(now(), interval 4 day), 4500), 

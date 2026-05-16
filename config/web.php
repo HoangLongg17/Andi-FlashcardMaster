@@ -13,7 +13,6 @@ $config = [
     ],
     'components' => [
         'request' => [
-            // !!! chèn một khóa bí mật vào phần dưới (nếu nó trống) - điều này là bắt buộc để xác thực cookie
             'cookieValidationKey' => 'lqog4-Od_VywviyPxtpNRF-zE9CzObX0',
         ],
         'cache' => [
@@ -29,7 +28,6 @@ $config = [
         'mailer' => [
             'class' => \yii\symfonymailer\Mailer::class,
             'viewPath' => '@app/mail',
-            // gửi tất cả thư đến một tệp theo mặc định.
             'useFileTransport' => true,
         ],
         'log' => [
@@ -61,10 +59,10 @@ $config = [
         
         
         'urlManager' => [
-            'enablePrettyUrl' => false,  // Tắt pretty URL để tránh issues với trailing slash
+            'enablePrettyUrl' => false,  
             'showScriptName' => true,
             'rules' => [
-                // Các quy tắc định tuyến của ông
+             
             ],
         ],
         
@@ -73,19 +71,15 @@ $config = [
 ];
 
 if (YII_ENV_DEV) {
-    // cấu hình điều chỉnh cho môi trường 'dev'
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
-        // bỏ comment dòng dưới để thêm IP của ông nếu ông không kết nối từ localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
+        
     ];
-
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
-        // bỏ comment dòng dưới để thêm IP của ông nếu ông không kết nối từ localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
+        
     ];
 }
 
