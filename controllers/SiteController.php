@@ -357,11 +357,12 @@ class SiteController extends Controller
             $model->examplesentence = trim($data['examplesentence'] ?? $model->examplesentence);
             $model->tags = trim($data['tags'] ?? $model->tags);
 
-            if ($model->save()) {
-                return ['success' => true, 'message' => 'Cập nhật từ vựng thành công!'];
-            }
+            if ($model->save(false)) {
+            return ['success' => true, 'message' => 'Cập nhật từ vựng thành công!'];
+        }
 
-            $errorMsg = reset($model->errors)[0] ?? 'Lỗi khi cập nhật dữ liệu.';
+            $errors = $model->getFirstErrors();
+            $errorMsg = !empty($errors) ? reset($errors) : 'Lỗi khi cập nhật dữ liệu.';
             return ['success' => false, 'message' => $errorMsg];
         }
   
