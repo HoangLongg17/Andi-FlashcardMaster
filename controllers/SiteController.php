@@ -924,19 +924,64 @@ class SiteController extends Controller
         }
 
         if (!$nextCard) {
-            return [
-                'success' => true,
-                'finished' => true,
-                'message' => 'Hoàn thành tất cả thẻ trong bộ này! 🎉'
-            ];
+            // FIX: Kiểm tra xem có thẻ nào vẫn chưa đạt trạng thái Ôn tập (status 2)
+            // Nếu có → lấy thẻ đó để tiếp tục học
+            // Chỉ báo "hoàn thành" khi TẤT CẢ thẻ đều đạt status = 2
+            
+            // Lấy ALL cards và kiểm tra có cards chưa hoàn thành
+            $allCards = Card::find()
+                ->where(['userid' => $userId, 'deckid' => $deckId])
+                ->with('progress')
+                ->all();
+            
+            $incompleteCards = [];
+            foreach ($allCards as $card) {
+                $status = $card->progress ? $card->progress->status : 0;
+                if ($status != 2) {  // Nếu không phải status 2 (Review), coi là chưa hoàn thành
+                    $incompleteCards[] = $card;
+                }
+            }
+            
+            // Nếu có thẻ chưa đạt status 2, lấy thẻ đầu tiên để tiếp tục
+            if (!empty($incompleteCards)) {
+                $nextCard = $incompleteCards[0];
+            } else {
+                // Tất cả thẻ đều đã đạt Review status (2) - hoàn toàn hoàn thành!
+                return [
+                    'success' => true,
+                    'finished' => true,
+                    'message' => 'Hoàn thành tất cả thẻ trong bộ này! 🎉'
+                ];
+            }
         }
 
         $cardIndex = 1;
-        foreach ($priorityQueue as $idx => $card) {
-            if ($card->cardid == $nextCard->cardid) {
-                $cardIndex = $idx + 1;
-                break;
+        $totalDisplayCards = count($priorityQueue);
+        
+        // Nếu nextCard từ incompleteCards (không trong priorityQueue), tính lại cardIndex
+        if ($totalDisplayCards > 0) {
+            foreach ($priorityQueue as $idx => $card) {
+                if ($card->cardid == $nextCard->cardid) {
+                    $cardIndex = $idx + 1;
+                    break;
+                }
             }
+        } else {
+            // nextCard từ incompleteCards, tính số cards chưa hoàn thành
+            $allCards = Card::find()
+                ->where(['userid' => $userId, 'deckid' => $deckId])
+                ->with('progress')
+                ->all();
+            
+            $incompleteCount = 0;
+            foreach ($allCards as $card) {
+                $status = $card->progress ? $card->progress->status : 0;
+                if ($status != 2) {
+                    $incompleteCount++;
+                }
+            }
+            $totalDisplayCards = $incompleteCount;
+            $cardIndex = 1;
         }
 
         return [
@@ -951,7 +996,7 @@ class SiteController extends Controller
                 'cardtype' => $nextCard->cardtype,
                 'tags' => $nextCard->tags,
                 'cardIndex' => $cardIndex,
-                'totalCards' => count($priorityQueue),
+                'totalCards' => $totalDisplayCards,
                 // SM2 data for JavaScript grade timing calculation
                 'status' => $nextCard->progress->status ?? 0,
                 'intervaldays' => $nextCard->progress->intervaldays ?? 0,
